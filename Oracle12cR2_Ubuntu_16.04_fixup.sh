@@ -2,8 +2,9 @@
 
 # Fixup script to be run after the Oracle installer throws an error usually around the linking process 
 
-export ORAPATH=12
-export ORACLE_HOME=/home/oracle/database/product/$ORAPATH/dbhome_1
+ORAVER=12.2.0
+ORAPATH=/home/oracle/database/product/$ORAVER
+export ORACLE_HOME=$ORAPATH/dbhome_1
 
 sudo ln -s $ORACLE_HOME/lib/libclntshcore.so.12.1 /usr/lib
 sudo ln -s $ORACLE_HOME/lib/libclntsh.so.12.1 /usr/lib

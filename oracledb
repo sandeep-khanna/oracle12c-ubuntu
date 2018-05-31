@@ -22,7 +22,7 @@ fi
 ### END INIT INFO
 
 # these are the paths for our base installation
-export ORACLE_VER=12
+export ORACLE_VER=12.2.0
 export ORACLE_BASE=/home/oracle/database
 export ORACLE_HOME=$ORACLE_BASE/product/$ORACLE_VER/dbhome_1
 #export LD_LIBRARY_PATH=$ORACLE_HOME/lib
