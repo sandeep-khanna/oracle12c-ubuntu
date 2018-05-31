@@ -1,0 +1,70 @@
+#! /bin/bash
+
+# /etc/init.d/oracledb
+#
+# Run-level Startup script for the Oracle Listener and Instances
+# It relies on the information on /etc/oratab
+ 
+
+if [ true != "$INIT_D_SCRIPT_SOURCED" ] ; then
+    set "$0" "$@"; INIT_D_SCRIPT_SOURCED=true . /lib/init/init-d-script
+fi
+
+### BEGIN INIT INFO
+# Provides:          oracledb
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Description: Oracle database auto start/stop script.
+#
+# It relies on the information on /etc/oratab
+### END INIT INFO
+
+# these are the paths for our base installation
+export ORACLE_VER=12
+export ORACLE_BASE=/home/oracle/database
+export ORACLE_HOME=$ORACLE_BASE/product/$ORACLE_VER/dbhome_1
+#export LD_LIBRARY_PATH=$ORACLE_HOME/lib
+export ORACLE_OWNR=oracle
+export PATH=$PATH:$ORACLE_HOME/bin
+export ORACLE_UNQNAME=oracledb
+
+if [ ! -f $ORACLE_HOME/bin/dbstart -o ! -d $ORACLE_HOME ] then
+	echo "Oracle startup: cannot start"
+	exit 1
+fi
+
+case "$1" in
+	start)
+		# Oracle listener and instance startup
+		echo "Starting Oracle: "
+		su - $ORACLE_OWNR -c "$ORACLE_HOME/bin/lsnrctl start"
+		su - $ORACLE_OWNR -c "$ORACLE_HOME/bin/dbstart $ORACLE_HOME"
+		#$ORACLE_HOME/bin/lsnrctl start
+		#$ORACLE_HOME/bin/dbstart $ORACLE_HOME
+		touch /var/lock/oracle
+		echo "OK"
+		;;
+	stop)
+		# Oracle listener and instance shutdown
+		echo "Shutdown Oracle: "
+		su - $ORACLE_OWNR -c "$ORACLE_HOME/bin/dbshut $ORACLE_HOME"
+		su - $ORACLE_OWNR -c "$ORACLE_HOME/bin/lsnrctl stop"
+		#$ORACLE_HOME/bin/dbshut $ORACLE_HOME
+		#$ORACLE_HOME/bin/lsnrctl stop
+		rm -f /var/lock/oracle
+		echo "OK"
+		;;
+	reload|restart)
+		$0 stop
+		$0 start
+		;;
+	*)
+		echo "Usage: `basename $0` start|stop|restart|reload"
+		exit 1
+esac
+
+exit 0
+
+###############################
